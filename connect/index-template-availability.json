@@ -1,0 +1,24 @@
+{
+  "_comentario": "Plantilla del índice de disponibilidad. Los campos son de filtrado y ordenamiento, no de búsqueda libre: por eso keyword y numéricos, no text.",
+  "index_patterns": ["availability"],
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 1,
+      "refresh_interval": "5s"
+    },
+    "mappings": {
+      "properties": {
+        "medicine_id": { "type": "keyword" },
+        "pharmacy_id": { "type": "keyword" },
+        "pharmacy":    { "type": "text", "fields": { "raw": { "type": "keyword" } } },
+        "city":        { "type": "keyword" },
+        "stock":       { "type": "integer" },
+        "price_cents": { "type": "long" },
+        "currency":    { "type": "keyword" },
+        "location":    { "type": "geo_point" },
+        "updated_at":  { "type": "date" }
+      }
+    }
+  }
+}

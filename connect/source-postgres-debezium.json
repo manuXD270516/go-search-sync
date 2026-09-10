@@ -1,0 +1,36 @@
+{
+  "name": "pharmacy-postgres-source",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "tasks.max": "1",
+
+    "database.hostname": "postgres",
+    "database.port": "5432",
+    "database.user": "pharmacy",
+    "database.password": "${file:/opt/kafka/secrets/connect.properties:postgres.password}",
+    "database.dbname": "pharmacy",
+    "topic.prefix": "pharmacy",
+
+    "plugin.name": "pgoutput",
+    "slot.name": "pharmacy_slot",
+    "publication.name": "pharmacy_pub",
+
+    "table.include.list": "public.medicines,public.availability",
+
+    "snapshot.mode": "initial",
+
+    "heartbeat.interval.ms": "10000",
+
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false",
+
+    "transforms": "unwrap,addKey",
+    "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+    "transforms.unwrap.drop.tombstones": "false",
+    "transforms.unwrap.delete.handling.mode": "rewrite",
+    "transforms.addKey.type": "org.apache.kafka.connect.transforms.ValueToKey",
+    "transforms.addKey.fields": "id"
+  }
+}

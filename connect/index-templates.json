@@ -1,0 +1,49 @@
+{
+  "_comentario": "Plantilla del índice de medicamentos. Se aplica ANTES de arrancar el sink para que OpenSearch no infiera tipos por su cuenta: el mapeo dinámico suele elegir text donde hace falta keyword, y eso rompe filtros y ordenamientos.",
+  "index_patterns": ["medicines"],
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 1,
+      "refresh_interval": "5s",
+      "analysis": {
+        "filter": {
+          "spanish_stop": { "type": "stop", "stopwords": "_spanish_" },
+          "spanish_stemmer": { "type": "stemmer", "language": "light_spanish" },
+          "medicine_synonyms": {
+            "type": "synonym",
+            "_comentario": "Sinónimos entre nombre comercial y principio activo: quien busca 'paracetamol' debe encontrar 'Panadol'.",
+            "synonyms": [
+              "paracetamol, acetaminofen, panadol",
+              "acido acetilsalicilico, aspirina, aas",
+              "ibuprofeno, advil, motrin"
+            ]
+          }
+        },
+        "analyzer": {
+          "spanish_medicines": {
+            "tokenizer": "standard",
+            "filter": ["lowercase", "asciifolding", "spanish_stop", "medicine_synonyms", "spanish_stemmer"]
+          }
+        }
+      }
+    },
+    "mappings": {
+      "properties": {
+        "id":   { "type": "keyword" },
+        "name": {
+          "type": "text",
+          "analyzer": "spanish_medicines",
+          "fields": { "raw": { "type": "keyword" } }
+        },
+        "active_ingredient": { "type": "text", "analyzer": "spanish_medicines" },
+        "form":       { "type": "keyword" },
+        "strength":   { "type": "keyword" },
+        "laboratory": { "type": "text", "fields": { "raw": { "type": "keyword" } } },
+        "requires_rx": { "type": "boolean" },
+        "search_text": { "type": "text", "analyzer": "spanish_medicines" },
+        "updated_at":  { "type": "date" }
+      }
+    }
+  }
+}
